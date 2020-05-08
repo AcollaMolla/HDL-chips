@@ -61,5 +61,15 @@ CHIP ALU {
    
 	//Negate outputs. Determine if negated or original result shall be outputted
 	Not16 (in = fxy, out = notFxy);
-	Mux16 (a = fxy, b = notFxy, sel = no, out = out);
+		Mux16 (a = fxy, b = notFxy, sel = no, out = oo, out[0..7] = zr0, out[8..15] = zr1);
+	Or16 (a = oo, b = oo, out = out);
+	
+	//Determine zr output pin
+	Or8Way (in = zr0, out = zrz0);
+	Or8Way (in = zr1, out = zrz1);
+	Or (a = zrz0, b = zrz1, out = zr2);
+	Mux (a = true, b = false, sel = zr2, out = zr);
+	
+	//Determine ng output pin
+	And16(a[0..15] = true,b = oo,out[15] = ng,out[0..14] = drop);
 }
